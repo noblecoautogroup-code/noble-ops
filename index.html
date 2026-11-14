@@ -14,7 +14,9 @@ var EXEC = 'https://script.google.com/macros/s/AKfycbyUNUpeYo9SVfgs2Znd681YAM7jg
 (async function () {
 var key = 'noble_page_cache', cached = '';
 try { cached = localStorage.getItem(key) || ''; } catch (e) {}
-function show(html) { document.open(); document.write(html); document.close(); }
+function show(html) { try { document.body.innerHTML = ''; } catch (e) {} document.open(); document.write(html); document.close(); }
+// wait for this shell to finish parsing, so the write replaces the page instead of landing inside it
+await new Promise(function (r) { if (document.readyState === 'complete') r(); else window.addEventListener('load', r); });
 // Cached copy first (instant); a fresh copy is fetched in the background for next time.
 if (cached) {
   show(cached);
